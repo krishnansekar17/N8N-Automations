@@ -1,4 +1,4 @@
-# 🚀 Argos GBP Daily Auto-Post — n8n Workflow
+# 🚀 Argos GBP Daily Auto-Post - n8n Workflow
 
 **Fully automated Google Business Profile posting system** that publishes product images with AI-generated captions twice daily. Zero manual effort after setup.
 
