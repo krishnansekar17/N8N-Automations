@@ -4,15 +4,12 @@ A collection of production-ready n8n workflow automations for digital marketing,
 
 Each folder contains a complete workflow JSON + detailed setup guide.
 
----
-
 ## Workflows
 
 | # | Workflow | Description | Status |
 |---|---------|-------------|--------|
-| 1 | [Argos GBP Daily Auto-Post](./argos-gbp-daily-auto-post/) | Automated Google Business Profile posting with AI-generated captions, photo uploads, and content calendar management | ✅ Live |
-
----
+| 1 | [Argos GBP Daily Auto-Post](argos-gbp-daily-auto-post) | Automated Google Business Profile posting with AI-generated captions, photo uploads, and content calendar management | ✅ Live |
+| 2 | [Argos Pinterest Daily Auto-Post](argos-pinterest-daily-auto-post) | Automated Pinterest posting with AI-generated SEO titles, descriptions, hashtags, and alt text across 22 boards | ✅ Live |
 
 ## How to Use
 
@@ -22,13 +19,11 @@ Each folder contains a complete workflow JSON + detailed setup guide.
 4. In n8n: **Import from File** → Select the JSON
 5. Configure your credentials and IDs as documented
 
----
-
 ## About
 
 Built by **Krishnan S** — Senior Digital Marketing Executive & AI Automation Specialist with 8+ years in digital marketing, now building AI-powered automation systems.
 
-🎥 [YouTube: AI with Krishnan](https://youtube.com/@aiwithkrishnan) — AI tutorials in Tamil
+🎬 [YouTube: AI with Krishnan](https://youtube.com/@aiwithkrishnan) — AI tutorials in Tamil
 
 ---
 
