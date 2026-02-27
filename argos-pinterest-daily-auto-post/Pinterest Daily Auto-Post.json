@@ -1,0 +1,576 @@
+{
+  "name": "Pinterest Daily Auto-Post",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 0,6,12,18 * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -1552,
+        -48
+      ],
+      "id": "75904f97-4418-46ec-9fa3-51c03af49aa9",
+      "name": "Run 4x Daily (Every 6 Hours CST)"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg",
+          "mode": "list",
+          "cachedResultName": "Argos Pinterest Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 57975081,
+          "mode": "list",
+          "cachedResultName": "Pinterest Queue",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg/edit#gid=57975081"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "PENDING"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1344,
+        -48
+      ],
+      "id": "92305460-27ba-4cf2-86d7-c70a9b920fb4",
+      "name": "Get Next Pending Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vlgmLyg0pZQeKWJZ",
+          "name": "Argos Google Sheets GBP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "04f26a45-d398-4c5d-ad7b-72d1ab3706d4",
+              "leftValue": "={{ $('Get Next Pending Row').first().json.row_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -768,
+        -48
+      ],
+      "id": "8678574e-a46a-424f-b973-c88db6ec0ed6",
+      "name": "Has Pending Row?"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "=system",
+              "content": "=You are a luxury fragrance copywriter for Argos Fragrances, a Dallas-based niche perfume house inspired by Greek mythology. You write Pinterest pin content that stops the scroll, drives clicks, and ranks in Pinterest search.\n\nYou must return a valid JSON object with exactly three fields:\n{\n  \"pin_title\": \"...\",\n  \"pin_description\": \"...\",\n  \"alt_text\": \"...\"\n}\n\n=== PIN TITLE RULES ===\n- HARD LIMIT: Max 100 characters\n- THE FIRST 30-35 CHARACTERS ARE ALL THAT SHOW IN PINTEREST FEEDS. This is your hook. Make it count.\n- Must include the fragrance name within the first 40 characters\n- Use natural, benefit-driven language. NOT keyword-stuffed.\n- NEVER start with \"Luxury\" or the brand name or \"Discover\". Start with what the PERSON gets.\n\nTITLE FORMULAS (rotate through these, never repeat the same formula twice):\n1. QUESTION HOOK: \"Looking for a Bold Oud? Try Adonis by Argos\"\n2. SCENARIO: \"Date Night Perfume That Gets Compliments - Adonis\"\n3. PROBLEM-SOLUTION: \"Tired of Generic Colognes? Meet Adonis by Argos\"\n4. SENSORY: \"Warm Vanilla and Deep Oud - Adonis Perfume\"\n5. LISTICLE STYLE: \"Top Niche Perfume for Men - Adonis by Argos\"\n6. SEASONAL MOMENT: \"Your New Fall Signature Scent - Adonis Perfume\"\n7. GIFT ANGLE: \"The Perfume Gift He Actually Wants - Adonis by Argos\"\n8. MYTHOLOGY HOOK: \"Greek God of Beauty in a Bottle - Adonis Perfume\"\n9. BOLD CLAIM: \"The Only Oud Perfume You Need - Adonis by Argos\"\n10. CURIOSITY GAP: \"This Niche Perfume Sells Out Every Season - Adonis\"\n\n=== PIN DESCRIPTION RULES ===\n- TARGET: 220-232 characters (PROVEN sweet spot, NOT 500)\n- 2-3 SHORT sentences maximum. Be ruthlessly concise.\n- MUST include 2-3 naturally placed keywords\n- End with a soft CTA varying between: \"Find it at argosfragrances.com\" / \"Shop now at argosfragrances.com\" / \"Discover more at argosfragrances.com\" / \"Available at argosfragrances.com\"\n- After CTA, add 3-4 hashtags on a NEW LINE\n- Hashtags: #ArgosFragrances always first, then 2-3 SPECIFIC ones\n\nDESCRIPTION PATTERNS (rotate these):\nA - STORY OPENER: \"Born from the myth of [mythology], [fragrance] opens with [note] and dries down to [note]. A niche perfume for [who/when]. Shop at argosfragrances.com\"\nB - SENSORY SCENE: \"[Vivid sensory scene]. [Fragrance] wraps [notes] around [mood]. Find it at argosfragrances.com\"\nC - DIRECT CONFIDENT: \"[Bold statement]. [Notes] make [fragrance] the go-to for [occasion]. Discover more at argosfragrances.com\"\nD - QUESTION ANSWER: \"What does [mythology] smell like? [Fragrance] answers with [notes]. Available at argosfragrances.com\"\nE - FOR-WHO: \"For the [type of person]: [fragrance] blends [notes] into something unforgettable. Shop at argosfragrances.com\"\n\n=== ALT TEXT RULES ===\n- Target 150-200 characters\n- Describe ONLY what is visually in the image\n- Include fragrance name and \"by Argos Fragrances\"\n- Use image filename clues for visual description\n- Purely descriptive, NOT promotional\n\n=== ANTI-GENERIC RULES (CRITICAL) ===\n1. NEVER start a description with \"Discover\", \"Experience\", \"Exude\", or \"Celebrate\"\n2. NEVER use \"inspired by Greek mythology\" as the main hook\n3. NEVER use \"this fragrance features notes of X and Y\" - weave notes into the scene\n4. Title and description must NOT repeat the same information\n5. NEVER use em dashes, semicolons, or ellipsis\n6. NEVER use: delve, tapestry, captivating, embark, unlock, elevate, journey, realm, embrace, testament, beacon, multifaceted, interplay, pivotal, nuanced, robust, paramount, groundbreaking, leverage, resonate, unveil, curate, foster, exude, allure, timeless elegance\n7. Write like a human. Mix short punchy sentences with longer ones.\n8. Every pin must feel completely different from the last.\n9. CRITICAL: Use ONLY the actual fragrance notes provided. NEVER invent or guess notes.\n10. Return ONLY the JSON object. No markdown, no code fences.\n\n=== GLOBAL RULES ===\n- Argos Fragrances sells ONLY online at argosfragrances.com. NEVER mention a physical store.\n- Reference Greek mythology behind the fragrance name when it fits naturally.\n- Return ONLY a valid JSON object."
+            },
+            {
+              "content": "=Write Pinterest pin content for this Argos fragrance:\n\nFragrance: {{ $('Get Next Pending Row').first().json.fragrance_name }}\nImage filename: {{ $('Get Next Pending Row').first().json.image_filename }}\nProduct URL: {{ $('Get Next Pending Row').first().json.product_url }}\nToday's Date: {{ new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) }}\n\n=== ACTUAL PRODUCT DETAILS (use these, do NOT invent notes) ===\nTop Notes: {{ $json.top_notes }}\nHeart Notes: {{ $json.middle_notes }}\nBase Notes: {{ $json.base_notes }}\nStyle: {{ $json.style }}\nBest For: {{ $json.best_for }}\nBrand Description (for context only, do NOT copy): {{ $json.description }}\n\nContent angle: {{ ['GIFT', 'SEASONAL', 'OCCASION', 'LIFESTYLE', 'DISCOVERY', 'SENSORY', 'MYTHOLOGY'][Math.floor(Math.random() * 7)] }}\nTitle formula: {{ ['QUESTION', 'SCENARIO', 'PROBLEM_SOLUTION', 'SENSORY', 'LISTICLE', 'SEASONAL', 'GIFT', 'MYTHOLOGY', 'BOLD_CLAIM', 'CURIOSITY'][Math.floor(Math.random() * 10)] }}\nDescription pattern: {{ ['STORY_OPENER', 'SENSORY_SCENE', 'DIRECT_CONFIDENT', 'QUESTION_ANSWER', 'FOR_WHO'][Math.floor(Math.random() * 5)] }}\n\nRULES:\n- Title: max 100 chars. First 30 chars = hook. Include fragrance name early. Use the title formula above.\n- Description: 220-232 characters. 2-3 sentences. Then 3-4 hashtags on new line. Use the description pattern above.\n- Alt text: 150-200 chars. Describe image visually.\n- Use ONLY the actual notes listed above. NEVER invent notes.\n- Return ONLY a JSON object with pin_title, pin_description, alt_text."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": 600,
+          "temperature": 0.9
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -624,
+        -192
+      ],
+      "id": "d669ddc4-70f6-4b41-9e57-7c741055d981",
+      "name": "Generate Pin Content",
+      "credentials": {
+        "openAiApi": {
+          "id": "wobFH91WAvBMiWPE",
+          "name": "Argos OpenAI for GBP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// FIX: correct path to AI response text\nconst aiResponse = $input.first().json.output[0].content[0].text;\n// Clean up any markdown code fences if present\nlet cleaned = aiResponse.replace(/```json\\n?/g, '').replace(/```\\n?/g, '').trim();\ntry {\n  const parsed = JSON.parse(cleaned);\n  \n  // Validate and extract fields\n  const title = parsed.pin_title || '';\n  const description = parsed.pin_description || '';\n  const altText = parsed.alt_text || '';\n  \n  // Truncate if over limits (safety net)\n  const safePinTitle = title.substring(0, 100);\n  const safePinDescription = description.substring(0, 500);\n  const safeAltText = altText.substring(0, 500);\n  \n  // Pass through original row data + parsed AI content\n  const original = $('Get Next Pending Row').first().json;\n  \n  return [{\n    json: {\n      ...original,\n      pin_title: safePinTitle,\n      pin_description: safePinDescription,\n      alt_text: safeAltText\n    },\n    pairedItem: { item: 0 }\n  }];\n} catch (e) {\n  return [{\n    json: {\n      pin_title: 'PARSE_ERROR',\n      pin_description: 'PARSE_ERROR: ' + e.message,\n      alt_text: aiResponse ? aiResponse.substring(0, 200) : 'No AI response received'\n    },\n    pairedItem: { item: 0 }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -208,
+        -144
+      ],
+      "id": "c636061f-b040-46a4-ae48-c4e01a650170",
+      "name": "Parse AI Response"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.pinterest.com/v5/pins",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"title\": \"{{ $json.pin_title }}\",\n  \"description\": \"{{ $json.pin_description.replace(/\\n/g, ' ') }}\",\n  \"link\": \"{{ $('Get Next Pending Row').first().json.product_url }}\",\n  \"alt_text\": \"{{ $json.alt_text }}\",\n  \"board_id\": \"{{ $('Get Next Pending Row').first().json.board_id }}\",\n  \"media_source\": {\n    \"source_type\": \"image_url\",\n    \"url\": \"{{ $('Get Next Pending Row').first().json.image_url }}\"\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        0,
+        -144
+      ],
+      "id": "6323f36c-60a2-4e26-9a87-914c8aef4821",
+      "name": "Create Pinterest Pin",
+      "retryOnFail": true,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "apORdbujRuJCoG4F",
+          "name": "Pinterest API Token"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg",
+          "mode": "list",
+          "cachedResultName": "Argos Pinterest Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 57975081,
+          "mode": "list",
+          "cachedResultName": "Pinterest Queue",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg/edit#gid=57975081"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_id": "={{ $('Get Next Pending Row').first().json.row_id }}",
+            "pin_title": "={{ $('Parse AI Response').first().json.pin_title }}",
+            "pin_description": "={{ $('Parse AI Response').first().json.pin_description }}",
+            "alt_text": "={{ $('Parse AI Response').first().json.alt_text }}",
+            "status": "={{ $json.status }}",
+            "pin_id": "={{ $json.pin_id }}",
+            "published_date": "={{ new Date().toISOString() }}",
+            "pinterest_response": "={{ $json.pinterest_response }}"
+          },
+          "matchingColumns": [
+            "row_id"
+          ],
+          "schema": [
+            {
+              "id": "row_id",
+              "displayName": "row_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fragrance_name",
+              "displayName": "fragrance_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_filename",
+              "displayName": "image_filename",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "drive_file_id",
+              "displayName": "drive_file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "image_url",
+              "displayName": "image_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "board_name",
+              "displayName": "board_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "board_id",
+              "displayName": "board_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "pin_title",
+              "displayName": "pin_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pin_description",
+              "displayName": "pin_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "alt_text",
+              "displayName": "alt_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "product_url",
+              "displayName": "product_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pin_id",
+              "displayName": "pin_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_date",
+              "displayName": "published_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "pinterest_response",
+              "displayName": "pinterest_response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        400,
+        -144
+      ],
+      "id": "3a80dcb9-d833-49e9-8e0f-dc20f249dede",
+      "name": "Mark as PUBLISHED",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vlgmLyg0pZQeKWJZ",
+          "name": "Argos Google Sheets GBP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\n// Check if Pinterest returned an error\nif (item.code || item.message || !item.id) {\n  // Error case\n  return [{\n    json: {\n      status: 'ERROR',\n      pin_id: '',\n      pinterest_response: JSON.stringify(item).substring(0, 200)\n    }\n  }];\n} else {\n  // Success case\n  return [{\n    json: {\n      status: 'PUBLISHED',\n      pin_id: item.id || '',\n      pinterest_response: JSON.stringify(item).substring(0, 200)\n    }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        -144
+      ],
+      "id": "c8659d4f-9660-496e-af61-7648c0138efb",
+      "name": "Check Pin Result"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg",
+          "mode": "list",
+          "cachedResultName": "Argos Pinterest Automation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1337426870,
+          "mode": "list",
+          "cachedResultName": "Fragrance Database",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1NhGwTL_J16p0OqeQjzm9yiBMEC0n3Usg4Kvz31J6iIg/edit#gid=1337426870"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -1136,
+        -48
+      ],
+      "id": "400c9e31-7f01-4b58-b113-b2ae59895e79",
+      "name": "Get Fragrance Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "vlgmLyg0pZQeKWJZ",
+          "name": "Argos Google Sheets GBP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the fragrance name from the queue row - normalize quotes\nconst fragranceName = $('Get Next Pending Row').first().json.fragrance_name.toLowerCase().replace(/[\\u2018\\u2019\\u2032]/g, \"'\");\n\n// Get all rows from the Fragrance Database\nconst dbRows = $('Get Fragrance Database').all();\n\n// Find the best match using short_name\nlet match = null;\nfor (const row of dbRows) {\n  const shortName = (row.json.short_name || '').toLowerCase().replace(/[\\u2018\\u2019\\u2032]/g, \"'\");\n  \n  const shortNames = shortName.split(',').map(s => s.trim());\n  for (const name of shortNames) {\n    if (name && fragranceName.includes(name)) {\n      match = row.json;\n      break;\n    }\n  }\n  if (match) break;\n}\n\n// Fallback: try matching words from fragrance_name\nif (!match) {\n  for (const row of dbRows) {\n    const dbName = (row.json.fragrance_name || '').toLowerCase().replace(/[\\u2018\\u2019\\u2032]/g, \"'\");\n    if (fragranceName.split(' ').filter(w => w.length > 3).every(w => dbName.includes(w))) {\n      match = row.json;\n      break;\n    }\n  }\n}\n\n// Get original row data to pass through\nconst originalRow = $('Get Next Pending Row').first().json;\n\n// Return matched details WITH original row data combined\nif (match) {\n  return [{\n    json: {\n      ...originalRow,\n      top_notes: match.top_notes || '',\n      middle_notes: match.middle_notes || '',\n      base_notes: match.base_notes || '',\n      style: match.style || '',\n      best_for: match.best_for || '',\n      description: (match.description || '').substring(0, 500),\n      short_name: match.short_name || '',\n      matched: true\n    },\n    pairedItem: { item: 0 }\n  }];\n} else {\n  return [{\n    json: {\n      ...originalRow,\n      top_notes: '',\n      middle_notes: '',\n      base_notes: '',\n      style: '',\n      best_for: '',\n      description: '',\n      short_name: '',\n      matched: false\n    },\n    pairedItem: { item: 0 }\n  }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -48
+      ],
+      "id": "ba5a46af-bd75-4e51-9bee-43377bd079a2",
+      "name": "Match Fragrance"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run 4x Daily (Every 6 Hours CST)": {
+      "main": [
+        [
+          {
+            "node": "Get Next Pending Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Next Pending Row": {
+      "main": [
+        [
+          {
+            "node": "Get Fragrance Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Pending Row?": {
+      "main": [
+        [
+          {
+            "node": "Generate Pin Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Pin Content": {
+      "main": [
+        [
+          {
+            "node": "Parse AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI Response": {
+      "main": [
+        [
+          {
+            "node": "Create Pinterest Pin",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Pinterest Pin": {
+      "main": [
+        [
+          {
+            "node": "Check Pin Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Pin Result": {
+      "main": [
+        [
+          {
+            "node": "Mark as PUBLISHED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Fragrance Database": {
+      "main": [
+        [
+          {
+            "node": "Match Fragrance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Fragrance": {
+      "main": [
+        [
+          {
+            "node": "Has Pending Row?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "timezone": "America/Chicago",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "4d235445-6483-407f-a203-6902f1ba6e68",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f9907f7735195927389e6653395cb98a2dfc5ecbdd5641aa84ccd8bc13f9a21f"
+  },
+  "id": "CfOGNqmiu6DbTrDPL2Fos",
+  "tags": []
+}
